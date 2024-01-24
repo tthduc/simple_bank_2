@@ -10,5 +10,5 @@ source /app/app.env
 # After running migrate up, we will start the app.
 echo "start the app"
 
-# It basically means: takes all parameters  passed to the script and run it.
+# It basically means: takes all parameters passed to the script and run it.
 exec "$@"
