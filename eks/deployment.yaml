@@ -1,0 +1,31 @@
+# the version of the Kubernetes API
+apiVersion: apps/v1
+# the kind of object we want to create
+kind: Deployment
+# metadata section, where we can specify some metadata for the object
+metadata:
+  # the name of the object
+  name: simple-bank-api-deployment
+  # the labels are basically some key-value pairs that are attached to the object
+  labels:
+    app: simple-bank-api
+# specification of the deployment object.
+spec:
+  # the number of pods we want to run with the same template
+  replicas: 2
+  # specify a pod selector for this deployment
+  selector:
+    matchLabels:
+      app: simple-bank-api
+  template:
+    metadata:
+      labels:
+        app: simple-bank-api
+    # This is where we tell the deployment how to deploy our containers.
+    spec:
+      containers:
+        - name: simple-bank-api
+          image: 417121009319.dkr.ecr.ap-southeast-1.amazonaws.com/myrepository:a79f95169efe14d51b3748a53137550874ebb97b
+          # This is the port that the container will expose to the network.
+          ports:
+            - containerPort: 8080
