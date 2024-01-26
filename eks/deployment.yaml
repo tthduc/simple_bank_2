@@ -26,6 +26,7 @@ spec:
       containers:
         - name: simple-bank-api
           image: 417121009319.dkr.ecr.ap-southeast-1.amazonaws.com/myrepository:latest
+          imagePullPolicy: Always
           # This is the port that the container will expose to the network.
           ports:
             - containerPort: 8080
