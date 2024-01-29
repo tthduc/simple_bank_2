@@ -3,12 +3,13 @@ package api
 import (
 	"database/sql"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/lib/pq"
 	"log"
 	"net/http"
 	db "simple_bank/db/sqlc"
 	"simple_bank/token"
+
+	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 )
 
 type createAccountParams struct {
