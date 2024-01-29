@@ -12,7 +12,7 @@ metadata:
 # specification of the deployment object.
 spec:
   # the number of pods we want to run with the same template
-  replicas: 1
+  replicas: 2
   # specify a pod selector for this deployment
   selector:
     matchLabels:
