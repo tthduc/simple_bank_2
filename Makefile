@@ -51,4 +51,7 @@ proto:
 evans:
 	evans --host localhost --port 9090 -r repl
 
-.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 test server mock db_docs db_schema proto evans
+statik:
+	statik -src=./doc/swagger -dest=./doc
+
+.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 test server mock db_docs db_schema proto evans statik
