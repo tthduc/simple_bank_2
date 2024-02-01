@@ -3,9 +3,9 @@
 # We use set -e instruction to make sure that the script will exit immediately if a command returns a non-zero status.
 set -e
 
-echo "run db migration"
-source /app/app.env
-/app/migrate -path /app/migration -database "$DB_SOURCE" -verbose up
+#echo "run db migration"
+#source /app/app.env
+#/app/migrate -path /app/migration -database "$DB_SOURCE" -verbose up
 
 # After running migrate up, we will start the app.
 echo "start the app"
