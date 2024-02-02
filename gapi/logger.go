@@ -46,12 +46,48 @@ type ResponseRecorder struct {
 	Body       []byte
 }
 
+// Since we want to keep track of the status code, we must override the WriteHeader function.
 func (rec *ResponseRecorder) WriteHeader(statusCode int) {
 	rec.StatusCode = statusCode
 	rec.ResponseWriter.WriteHeader(statusCode)
 }
 
+// override the Write() method, whenever it wants to set the response body.
 func (rec *ResponseRecorder) Write(body []byte) (int, error) {
 	rec.Body = body
 	return rec.ResponseWriter.Write(body)
+}
+
+func HttpLogger(handler http.Handler) http.Handler {
+	/*
+		The http package already provides a HandlerFunc type,
+		which implements the ServeHTTP function required by the interface.
+		In fact, it’s just an alias for this function signature,
+	*/
+	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		startTime := time.Now()
+		rec := &ResponseRecorder{
+			ResponseWriter: res,
+			StatusCode:     http.StatusOK,
+		}
+
+		// We have to call handler.ServeHTTP() function, To forward the request to its handler function to be processed.
+		handler.ServeHTTP(rec, req)
+
+		// we simply use time.Since() function to calculate the running duration.
+		duration := time.Since(startTime)
+
+		logger := log.Info()
+		if rec.StatusCode != http.StatusOK {
+			logger = log.Error().Bytes("body", rec.Body)
+		}
+
+		logger.Str("protocol", "http").
+			Str("method", req.Method).
+			Str("path", req.RequestURI).
+			Int("status_code", rec.StatusCode).
+			Str("status_text", http.StatusText(rec.StatusCode)).
+			Dur("duration", duration).
+			Msg("received a HTTP request")
+	})
 }
