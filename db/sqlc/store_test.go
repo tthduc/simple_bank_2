@@ -23,7 +23,7 @@ func TestTransferTx(t *testing.T) {
 	for i := 0; i < n; i++ {
 		txName := make(chan TransferTxResult)
 		go func() {
-			ctx := context.WithValue(context.Background(), txKey, txName)
+			ctx := context.WithValue(context.Background(), "", txName)
 			//ctx := context.Background()
 			result, err := store.TransferTx(ctx, TransferTxParams{
 				FromAccountID: account1.ID,
