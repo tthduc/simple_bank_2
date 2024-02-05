@@ -7,6 +7,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/hibiken/asynq"
 	_ "github.com/lib/pq"
 	"github.com/rakyll/statik/fs"
 	"github.com/rs/zerolog"
@@ -23,6 +24,7 @@ import (
 	"simple_bank/gapi"
 	"simple_bank/pb"
 	"simple_bank/util"
+	"simple_bank/worker"
 )
 
 func main() {
@@ -43,8 +45,15 @@ func main() {
 	runDBMigration(config.MigrationUrl, config.DBSource)
 
 	store := db.NewStore(conn)
-	go runGatewayServer(config, store)
-	runGrpcServer(config, store)
+
+	redisOpt := asynq.RedisClientOpt{
+		Addr: config.RedisAddress,
+	}
+	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
+
+	go runGatewayServer(config, store, taskDistributor)
+	go runTaskProcessor(redisOpt, store)
+	runGrpcServer(config, store, taskDistributor)
 }
 
 func runDBMigration(migrationURL string, dbSource string) {
@@ -60,8 +69,8 @@ func runDBMigration(migrationURL string, dbSource string) {
 	log.Info().Msg("db migrated successfully")
 }
 
-func runGrpcServer(config util.Config, store db.Store) {
-	server, err := gapi.NewServer(config, store)
+func runGrpcServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) {
+	server, err := gapi.NewServer(config, store, taskDistributor)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create server")
 	}
@@ -95,8 +104,8 @@ func runGinServer(config util.Config, store db.Store) {
 	}
 }
 
-func runGatewayServer(config util.Config, store db.Store) {
-	server, err := gapi.NewServer(config, store)
+func runGatewayServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) {
+	server, err := gapi.NewServer(config, store, taskDistributor)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create server")
 	}
@@ -142,4 +151,31 @@ func runGatewayServer(config util.Config, store db.Store) {
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot start HTTP gateway server")
 	}
+}
+
+func runTaskProcessor(
+	//ctx context.Context,
+	//waitGroup *errgroup.Group,
+	//config util.Config,
+	redisOpt asynq.RedisClientOpt,
+	store db.Store,
+) {
+	//mailer := mail.NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store)
+
+	log.Info().Msg("start task processor")
+	err := taskProcessor.Start()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to start task processor")
+	}
+
+	//waitGroup.Go(func() error {
+	//	<-ctx.Done()
+	//	log.Info().Msg("graceful shutdown task processor")
+	//
+	//	taskProcessor.Shutdown()
+	//	log.Info().Msg("task processor is stopped")
+	//
+	//	return nil
+	//})
 }
