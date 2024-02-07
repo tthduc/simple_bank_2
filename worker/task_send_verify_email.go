@@ -42,6 +42,8 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 		return fmt.Errorf("failed to unmarshal payload: %w", asynq.SkipRetry)
 	}
 
+	// In some rare cases, anything could happen. So, one way to deal with that, is to always allow the task to retry.
+	// And hopefully at that time, it will be successful, when the transaction has been committed.
 	user, err := processor.store.GetUser(ctx, payload.Username)
 	if err != nil {
 		return fmt.Errorf("failed to get user: %w", err)
