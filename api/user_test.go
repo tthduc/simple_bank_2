@@ -23,6 +23,7 @@ type eqCreateUserParamsMatcher struct {
 	password string
 }
 
+// Dùng để kiểm tra params đầu vào có đúng hay không
 func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
 	arg, ok := x.(db.CreateUserParams)
 	if !ok {
@@ -38,6 +39,7 @@ func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
 	return reflect.DeepEqual(e.arg, arg)
 }
 
+// Dùng để logger
 func (e eqCreateUserParamsMatcher) String() string {
 	return fmt.Sprintf("matches arg %v and password %v", e.arg, e.password)
 }
