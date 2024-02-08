@@ -33,8 +33,12 @@ test:
 server:
 	go run main.go
 
+#mock:
+	#mockgen -destination db/mock/store.go simple_bank/db/sqlc Store
+
 mock:
-	mockgen -destination db/mock/store.go simple_bank/db/sqlc Store
+	mockgen -package mockdb -destination db/mock/store.go simple_bank/db/sqlc Store
+	mockgen -package mockwk -destination worker/mock/distributor.go simple_bank/worker TaskDistributor
 
 db_docs:
 	dbdocs build doc/db.dbml
