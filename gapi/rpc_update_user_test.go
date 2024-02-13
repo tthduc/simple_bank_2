@@ -17,9 +17,9 @@ import (
 )
 
 func TestUpdateUserAPI(t *testing.T) {
-	user, _ := randomUser(t, "")
-	//other, _ := randomUser(t, util.DepositorRole)
-	//banker, _ := randomUser(t, util.BankerRole)
+	user, _ := randomUser(t, util.DepositorRole)
+	other, _ := randomUser(t, util.DepositorRole)
+	banker, _ := randomUser(t, util.BankerRole)
 
 	newName := util.RandomOwner()
 	newEmail := util.RandomEmail()
@@ -111,7 +111,7 @@ func TestUpdateUserAPI(t *testing.T) {
 					Return(updatedUser, nil)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, banker.Username, banker.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error) {
 				require.NoError(t, err)
@@ -122,28 +122,28 @@ func TestUpdateUserAPI(t *testing.T) {
 				require.Equal(t, newEmail, updatedUser.Email)
 			},
 		},
-		//{
-		//	name: "OtherDepositorCannotUpdateThisUserInfo",
-		//	req: &pb.UpdateUserRequest{
-		//		Username: user.Username,
-		//		FullName: &newName,
-		//		Email:    &newEmail,
-		//	},
-		//	buildStubs: func(store *mockdb.MockStore) {
-		//		store.EXPECT().
-		//			UpdateUser(gomock.Any(), gomock.Any()).
-		//			Times(0)
-		//	},
-		//	buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-		//		return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
-		//	},
-		//	checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error) {
-		//		require.Error(t, err)
-		//		st, ok := status.FromError(err)
-		//		require.True(t, ok)
-		//		require.Equal(t, codes.PermissionDenied, st.Code())
-		//	},
-		//},
+		{
+			name: "OtherDepositorCannotUpdateThisUserInfo",
+			req: &pb.UpdateUserRequest{
+				Username: user.Username,
+				FullName: &newName,
+				Email:    &newEmail,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					UpdateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, other.Username, other.Role, time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.True(t, ok)
+				require.Equal(t, codes.PermissionDenied, st.Code())
+			},
+		},
 		{
 			name: "UserNotFound",
 			req: &pb.UpdateUserRequest{
