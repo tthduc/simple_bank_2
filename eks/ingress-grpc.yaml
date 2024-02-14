@@ -11,7 +11,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: "gapi.simplebanktest.com"
+    - host: "test.gapi.hanetcamera.com"
       http:
         paths:
           - pathType: Prefix
@@ -23,5 +23,5 @@ spec:
                   number: 90
   tls:
     - hosts:
-        - gapi.simplebanktest.com
+        - test.gapi.hanetcamera.com
       secretName: simple-bank-gapi-cert
