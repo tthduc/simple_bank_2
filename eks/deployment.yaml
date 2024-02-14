@@ -30,3 +30,6 @@ spec:
           # This is the port that the container will expose to the network.
           ports:
             - containerPort: 8080
+              name: http-server
+            - containerPort: 9090
+              name: grpc-server

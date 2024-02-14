@@ -16,7 +16,7 @@ COPY start.sh .
 COPY wait-for.sh .
 COPY db/migration ./db/migration
 
-EXPOSE 8080
+EXPOSE 8080 9090
 
 # To define the default command to run when the container starts
 CMD ["/app/main"]
