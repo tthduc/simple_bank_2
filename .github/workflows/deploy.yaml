@@ -49,7 +49,6 @@ jobs:
       - name: Deploy image to Amazon EKS
         run: |
           kubectl apply -f eks/aws-auth.yaml
-#         sometimes the deployment.yaml is not getting deployed, In that case, we can use the kubectl rollout  restart command to force the deployment.
           kubectl rollout restart -f eks/deployment.yaml
           kubectl apply -f eks/service.yaml
           kubectl apply -f eks/issuer.yaml
