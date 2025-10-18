@@ -46,6 +46,8 @@ service SimpleBank {
         };
     }
 
+    // The backend API was developed using gRPC framework,
+    // with grpc-gateway to translate gRPC to RESTful API
     rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
         option (google.api.http) = {
             post: "/v1/login_user"

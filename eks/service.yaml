@@ -17,4 +17,5 @@ spec:
       port: 90
       targetPort: grpc-server
       name: grpc-service
+  # ClusterIP means don't want to expose to outside
   type: ClusterIP
