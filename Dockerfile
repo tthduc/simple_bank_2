@@ -1,6 +1,10 @@
 # Build stage only build binary file of golang
 FROM golang:1.20-alpine3.19 AS builder
 WORKDIR /app
+
+# COPY <source> <destination>
+# source: folder or file in your local
+# destination: folder in the container
 COPY . .
 RUN go build -o main main.go
 #RUN apk add curl
